@@ -1,0 +1,4 @@
+ScalaDays
+=========
+
+Proposal for scaladays
