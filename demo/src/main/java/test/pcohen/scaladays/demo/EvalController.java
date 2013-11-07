@@ -4,6 +4,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import java.io.PrintWriter;
 
+import org.springframework.core.convert.Property;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -53,6 +54,7 @@ public class EvalController {
 	@RequestMapping(value="/eval",method = RequestMethod.POST)
 	public @ResponseBody
 	Response evalCode(@RequestBody String content) throws Exception {
+		
 		System.out.println("========================= CP is "+System.getProperty("java.class.path"));
 		Gson gson = new Gson();
 		Request request = gson.fromJson(content, Request.class);
