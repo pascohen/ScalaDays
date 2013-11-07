@@ -48,12 +48,12 @@ class Request {
 }
 
 @Controller
-@RequestMapping("/eval")
 public class EvalController {
 
-	@RequestMapping(method = RequestMethod.POST)
+	@RequestMapping(value="/eval",method = RequestMethod.POST)
 	public @ResponseBody
 	Response evalCode(@RequestBody String content) throws Exception {
+		System.out.println("========================= CP is "+System.getProperty("java.class.path"));
 		Gson gson = new Gson();
 		Request request = gson.fromJson(content, Request.class);
 		String encoding = "UTF-8";
@@ -63,8 +63,7 @@ public class EvalController {
 		System.setOut(printStream);
 		PrintWriter writer = new PrintWriter(printStream);
 
-		try {
-			
+		try {	   
 		Object s = new Eval().eval(request.getContent(),writer);
 		System.setOut(oldPrintStream);
 		return new Response(stream.toString(), s.toString());
