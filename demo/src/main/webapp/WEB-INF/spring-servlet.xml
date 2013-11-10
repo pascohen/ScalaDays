@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+       http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-2.0.xsd">
+
+  <!-- the application context definition for the springapp DispatcherServlet -->
+
+<bean class="org.springframework.web.servlet.mvc.annotation.AnnotationMethodHandlerAdapter">
+    <property name="messageConverters">
+      <util:list id="beanList">
+        <ref bean="stringHttpMessageConverter"/>
+        <ref bean="marshallingHttpMessageConverter"/>
+      </util:list>
+    </property>
+</bean>
+
+<bean id="stringHttpMessageConverter" 
+       class="org.springframework.http.converter.StringHttpMessageConverter"/>
+       
+<bean id="marshallingHttpMessageConverter" 
+  class="org.springframework.http.converter.json.MappingJacksonHttpMessageConverter" />
+
+  <bean name="/eval" class="test.pcohen.scaladays.demo.EvalController"/>
+
+</beans>

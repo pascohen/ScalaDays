@@ -1,0 +1,4 @@
+<plugin>
+  <name>demoplugin</name>
+  <classname>test.pcohen.scaladays.compilerplugin.PluginCompiler</classname>
+</plugin>

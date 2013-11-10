@@ -51,26 +51,35 @@ class Request {
 @Controller
 public class EvalController {
 
-	@RequestMapping(value="/eval",method = RequestMethod.POST)
+	@RequestMapping(value = "/eval", method = RequestMethod.POST)
 	public @ResponseBody
 	Response evalCode(@RequestBody String content) throws Exception {
-		
-		System.out.println("========================= CP is "+System.getProperty("java.class.path"));
+
 		Gson gson = new Gson();
 		Request request = gson.fromJson(content, Request.class);
 		String encoding = "UTF-8";
 		ByteArrayOutputStream stream = new ByteArrayOutputStream();
 		PrintStream printStream = new PrintStream(stream, true, encoding);
-		PrintStream oldPrintStream = System.out;
-		System.setOut(printStream);
-		PrintWriter writer = new PrintWriter(printStream);
 
-		try {	   
-		Object s = new Eval().eval(request.getContent(),writer);
-		System.setOut(oldPrintStream);
-		return new Response(stream.toString(), s.toString());
+		try {
+			Evaluator evaluator = new Evaluator(printStream);
+			evaluator.withContinuations();
+			evaluator
+			      .withPluginsDir("/home/pcohen/workspace/scala211/ScalaDays/plugins");
+			evaluator.withLibsDir("/home/pcohen/workspace/scala211/ScalaDays/jars");
+			Object s = evaluator.eval(request.getContent());
+			if (s == null)
+				s = "";
+			evaluator.close();
+			return new Response(stream.toString(), s.toString());
 		} catch (Exception e) {
-			return new Response(stream.toString(), e.toString());
+			e.printStackTrace();
+
+			ByteArrayOutputStream errorStream = new ByteArrayOutputStream();
+			PrintStream errorPrintStream = new PrintStream(errorStream, true,
+			      encoding);
+			e.printStackTrace(errorPrintStream);
+			return new Response(stream.toString(), errorStream.toString());
 		}
 	}
 }
