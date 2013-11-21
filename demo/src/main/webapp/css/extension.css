@@ -1,0 +1,26 @@
+a[href^="http://www.vim.org"]:before {
+  content: "";
+  display: inline-block;
+  width: 0.8em;
+  height: 0.8em;
+  margin: 0 5px;
+  position: relative;
+  top: 2px;
+  background-image: url(../vim.jpg);
+  background-size: contain;
+  }
+
+textarea {
+	resize: none;
+}
+
+textarea.codeinput {
+	background-color: #dddddd;
+	color:black;
+}
+
+textarea.codeoutput {
+	background-color: #151515;
+	color: white;
+	readonly: true;
+}
