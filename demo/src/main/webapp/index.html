@@ -1,25 +1,45 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
+   <head>
+      <style type="text/css" media="screen">
+         #codecontent { 
+            display: inline-block;
+            width: 55%;
+            height: 600px;
+            margin:0;
+            padding:0;
+         }
+      </style>
+   </head>
+   <body>
+      <div id="codecontent">val i = 10
+def f(i:Int) = i+1
+f(i)</div>
+      <div style="display: inline-block; width: 44%; height: 600px; vertical-align: top;">
+         <textarea id="output" class="codeoutput" style="height: 48%; width: 100%; -moz-box-sizing: border-box; margin-bottom:2%;" readonly></textarea>
+         <textarea id="status" class="codeoutput" style="height: 48%; width: 100%; -moz-box-sizing: border-box; margin-top:2%;" readonly></textarea>
+      </div>
+      <div style="text-align:left"><input type="submit" onClick="submitContent()" value="eval" /></div>
+      
+      <script src="js/ace.js" type="text/javascript" charset="utf-8"></script>
+      <script>
+   var editor = ace.edit("codecontent");
+   editor.setTheme("ace/theme/monokai");
+   editor.getSession().setMode("ace/mode/scala");
 
-<body>
-<script language="Javascript">
-<!--
-function submitContent() {
-
-    var content='{content: '+JSON.stringify(document.getElementById('content').value)+'}'
-    var xmlHttpReq = false;
-    // Mozilla/Safari
-    if (window.XMLHttpRequest) {
+   function submitContent() {
+      var content='{content: '+JSON.stringify(editor.getValue())+'}'
+      var xmlHttpReq = false;
+      // Mozilla/Safari
+      if (window.XMLHttpRequest) {
         xmlHttpReq = new XMLHttpRequest();
-    }
-    // IE
-    else if (window.ActiveXObject) {
+      }
+      // IE
+      else if (window.ActiveXObject) {
         xmlHttpReq = new ActiveXObject("Microsoft.XMLHTTP");
-    }
-    
-    //alert('eval content: '+content)
-    
-    xmlHttpReq.onreadystatechange = function() {
+      }
+  
+      xmlHttpReq.onreadystatechange = function() {
       if (xmlHttpReq.readyState == 4) {
         var result = JSON.parse(xmlHttpReq.responseText);
         document.getElementById('output').innerHTML = result.output;
@@ -30,14 +50,6 @@ function submitContent() {
     xmlHttpReq.setRequestHeader('Content-Type', 'application/json');
     xmlHttpReq.send(content);
 }
--->
-</script>
-<textarea id="content" rows="4" cols="50">
-</textarea>
-<input type="submit" onClick="submitContent()" value="eval" />
-<textarea id="output" rows="4" cols="50">
-</textarea>
-<textarea id="status" rows="4" cols="50">
-</textarea>
-</body>
+      </script>
+   </body>
 </html>
