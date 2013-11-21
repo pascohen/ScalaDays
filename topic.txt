@@ -1,0 +1,14 @@
+Title: Why Scala Compiler Plugins do matter
+-------------------------------------------------------
+
+Content: Scala Compiler Plugins are probably an underestimated part of the Scala developer toolkit. Macros have brought some light on meta programming through AST manipulation but there are some use cases that macros cannot solve. This is where Scala Compiler plugins come to the rescue. The purpose of this talk is to describe how to write a Scala Compiler Plugin based on particular use case:
+
+"Custom scala scripts are written remotely by end users and submitted through a web service to be evaluated on the server. Scripts must be sandboxed to ensure security"
+
+Using Scala Compiler plugins is an interesting option to secure and modifiy such submitted scripts.
+In this talk, we'll go through the different steps to create a compiler plugin and the different options available to visit or modify the AST in order to solve various problems.
+
+We'll finish by challenging the compiler plugins choice compared to alternatives like macros, AOP with traits or JAAS that could also achieve differently the studied use cases .
+
+
+
