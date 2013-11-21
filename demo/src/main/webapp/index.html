@@ -4,20 +4,24 @@
       <style type="text/css" media="screen">
          #codecontent { 
             display: inline-block;
-            width: 55%;
-            height: 600px;
+            width: 100%;
+            height: 620px;
             margin:0;
-            padding:0;
+            padding:0;<F5>
          }
       </style>
    </head>
    <body>
+      <div style="display: inline-block; width: 54%; height: 630px; vertical-align: top;">
+     <div>input:</div>
       <div id="codecontent">val i = 10
 def f(i:Int) = i+1
-f(i)</div>
-      <div style="display: inline-block; width: 44%; height: 600px; vertical-align: top;">
-         <textarea id="output" class="codeoutput" style="height: 48%; width: 100%; -moz-box-sizing: border-box; margin-bottom:2%;" readonly></textarea>
-         <textarea id="status" class="codeoutput" style="height: 48%; width: 100%; -moz-box-sizing: border-box; margin-top:2%;" readonly></textarea>
+f(i)</div></div>
+      <div style="display: inline-block; width: 44%; height: 660px; vertical-align: top; margin-left: 15px; ">
+	      <div>output:</div>
+	      <pre id="output" style="background-color: #eee; height: 45%; width: 100%; -moz-box-sizing: border-box; margin-bottom:1.5%; margin-top:0"></pre>
+	      <div style="margin-top:2%">status:</div>
+         <pre id="status" style="background-color: #eee; height: 45%; width: 100%; -moz-box-sizing: border-box; margin-top:0"></pre>
       </div>
       <div style="text-align:left"><input type="submit" onClick="submitContent()" value="eval" /></div>
       
