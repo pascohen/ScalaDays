@@ -27,26 +27,22 @@
       <script src="lib/js/html5shiv.js"></script>
    <![endif]-->
    <style type="text/css" media="screen">
-         #codecontent { 
+	 #codecontent { 
+            background: #E3E4FA;
             display: inline-block;
             width: 100%;
             height: 620px;
             margin:0;
             padding:0;
-            text-align:left;
-            cursor: url(cursor.cur);
-           
-          
--moz-animation: blink 2s linear 0s infinite;
+	    text-align:left;
+
+	    font-family: 'Monaco','Menlo','Ubuntu Mono','Consolas','source-code-pro',monospace;
+         }
+
+#codecontent .ace_cursor {
+  border-left: 2px solid black;
 }
  
-@-moz-keyframes blink {
-0% { background: #0a0 }
-47% { background: #090 }
-50% { background: #000 }
-97% { background: #000 }
-100% { background: #090 }
-}
       </style>
 </head>
 
@@ -55,56 +51,122 @@
     <!-- Any section element inside of this container is displayed as a slide -->
     <div class="slides">
       <section>
-        <h1>Scala Compiler plugins</h1>
+        <h2>Scala Compiler plugins</h2>
         <hr />
         <h3>Why they matter!</h3>
       </section>
       <section>
-        <h1>Scala Compiler plugins</h1>
-        <hr />
-        <h3>Why they matter!</h3>
+         <section>
+            <h3>Let's start with a simple exemple</h3>
+      	    <hr />
+	 </section>
+         <section>
+            <h3>Let's consider that Java Code</h3>
+	    <hr />
+<pre><code>public class ImmutableClass {
+   private String field1;
+   private int    field2;
+
+   public ImmutableClass(String f1, int f2) {
+      field1 = f1;
+      field2 = f2;
+   }
+
+   public String getField1() { return field1; }
+   public int getField2()    { return field2; }
+}</code>
+</pre>
+Pffeeeew ... much code
+	 </section>
+         <section>
+            <h3>Let's make it simpler</h3>
+	    <hr />
+<pre><code>@Immutable class ImmutableClass {
+   String field1;
+   int    field2;
+}</code>
+</pre>
+Ok much better
+Thanks to Metaprogramming/AST in Groovy
+	 </section>
+         <section>
+            <h3>Ok ... in Scala there are classes ;)</h3>
+	    <hr />
+<pre><code>case class ImmutableClass(val String field1, val Int field2)
+</code>
+</pre>
+	 </section>
       </section>
       <section>
         <h1>Agenda</h1>
         <hr />
 	<ol>
-          <li>A use case to guide our session</li>
-          <li>MetaProgramming is not recent</li>
-          <li>How to create Compiler plugins</li>
-	  <li>How does the AST look like in Scala</li>
-	  <li>Let's first visit the AST</li>
-	  <li>What about altering the AST structure</li>
-          <li>Let's see that in Action</li>
-          <li>Can we solve the</li>
-          <li>Conclusion: Do Scala Compiler really matter?</li>
+	  <li>Introduction</li>
+          <li>Plumbing</li>
+	  <li>Visiting the AST</li>
+	  <li>Altering the AST</li>
+	  <li>Let's see that in action</li>
+          <li>Alternatives</li>
+	  <li>Conclusion</li>
         </ol>
       </section>
+<section>
+MetaProgramming is not recent
+</section>
+<section>
+A use case for this session
+</section>
+<section>
+How to create Compiler plugins
+</section>
+<section>
+How does the AST look like in Scala
+show raw
+Class ValDef
+</section>
+<section>
+Manual
+Visiting
+</section>
+<section>
+Manual
+Quasiquotes
+Reify
+</section>
       <section>
       <section>
         <h3>Let's see that in action</h3>
-        With NetBeans
-        </section>
-	<section>
+	</section>
+      <section>
+Explanations
+      </section>
+	<!--section>
         <iframe style="display: inline-block; width: 100%; height: 720px; vertical-align: top;" src="index.html"></iframe> 
-        </section>
-
+        </section-->
         <section>
          <div style="display: inline-block; width: 54%; height: 100%; vertical-align: top;">
-     <div style="text-align:left">input:</div>
-      <div id="codecontent">val i = 10
-def f(i:Int) = i+1
-f(i)</div></div>
+     <div style="text-align:left; font-size:0.8em">input:</div>
+      <div id="codecontent" style="font-size:0.7em; line-height:100%" ></div></div>
       <div style="display: inline-block; width: 44%; height: 100%; vertical-align: top; margin-left:10px">
-	      <div style="text-align:left">output:</div>
-	      <pre id="output" style="background-color: #eee; height: 282px; width: 100%; -moz-box-sizing: border-box; margin-bottom:1.5%; margin-top:0"></pre>
-	      <div style="text-align:left; margin-top:2%">status:</div>
-         <pre id="status" style="background-color: #eee; height: 282px; width: 100%; -moz-box-sizing: border-box; margin-top:0"></pre>
+	      <div style="text-align:left ; font-size:0.8em">output:</div>
+	      <pre id="output" style="font-size:0.7em; background-color: #eee; height: 282px; width: 100%; -moz-box-sizing: border-box; margin-bottom:1.5%; margin-top:0; overflow:scroll; line-height: 90%"></pre>
+	      <div style="text-align:left; margin-top:2%; font-size:0.8em">status:</div>
+	 <pre id="status" style="font-size:0.7em; background-color: #eee; height: 282px; width: 100%; -moz-box-sizing: border-box; margin-top:0; overflow:scroll; line-height: 90%"></pre>
       </div>
-      <div style="text-align:left"><input type="submit" onClick="submitContent()" value="eval" /></div>
-     
+      <div style="text-align:left"><input style="font-size:0.6em" type="submit" onClick="submitContent()" value="eval" /></div>
         </section>
-
-      </section>
+	</section>
+	<section>
+AST is too complex and error prone
+Are there alternatives to solve the different use cases
+Macros
+JAAS
+Traits
+Futures
+</section>
+	<section>
+	Conclusion:Do Scala Compiler really matter?Should I use them
+			</section>
       <section>
         <h3>Further reading</h3>
         http://radar.oreilly.com/2011/09/java7-features.html
@@ -182,7 +244,7 @@ f(i)</div></div>
      <script src="js/ace.js" type="text/javascript" charset="utf-8"></script>
       <script>
    var editor = ace.edit("codecontent");
-   editor.setTheme("ace/theme/github");
+   editor.setTheme("ace/theme/tomorrow");
    editor.getSession().setMode("ace/mode/scala");
 
    function submitContent() {

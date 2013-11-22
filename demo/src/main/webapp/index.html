@@ -2,33 +2,39 @@
 <html lang="en">
    <head>
       <style type="text/css" media="screen">
-         #codecontent { 
+	 body {
+           
+           font-size: 1.4em;
+         }
+
+	 #codecontent { 
+            background: #E3E4FA;
+            font-size: 1em;
             display: inline-block;
             width: 100%;
             height: 620px;
             margin:0;
-            padding:0;<F5>
+            padding:0;            
          }
       </style>
    </head>
    <body>
       <div style="display: inline-block; width: 54%; height: 630px; vertical-align: top;">
-     <div>input:</div>
-      <div id="codecontent">val i = 10
-def f(i:Int) = i+1
-f(i)</div></div>
+      <div>input:</div>
+        <div id="codecontent"></div>
+      </div>
       <div style="display: inline-block; width: 44%; height: 660px; vertical-align: top; margin-left: 15px; ">
 	      <div>output:</div>
-	      <pre id="output" style="background-color: #eee; height: 45%; width: 100%; -moz-box-sizing: border-box; margin-bottom:1.5%; margin-top:0"></pre>
+	      <pre id="output" style="background-color: #eee; height: 44.5%; width: 100%; -moz-box-sizing: border-box; margin-bottom:1.5%; margin-top:0; overflow: scroll"></pre>
 	      <div style="margin-top:2%">status:</div>
-         <pre id="status" style="background-color: #eee; height: 45%; width: 100%; -moz-box-sizing: border-box; margin-top:0"></pre>
+         <pre id="status" style="background-color: #eee; height: 44.5%; width: 100%; -moz-box-sizing: border-box; margin-top:0; overflow: scroll"></pre>
       </div>
-      <div style="text-align:left"><input type="submit" onClick="submitContent()" value="eval" /></div>
+      <div style="text-align:left"><input style="font-size: 1em" type="submit" onClick="submitContent()" value="eval" /></div>
       
       <script src="js/ace.js" type="text/javascript" charset="utf-8"></script>
       <script>
    var editor = ace.edit("codecontent");
-   editor.setTheme("ace/theme/monokai");
+   editor.setTheme("ace/theme/tomorrow");
    editor.getSession().setMode("ace/mode/scala");
 
    function submitContent() {
