@@ -111,37 +111,170 @@ Thanks to Metaprogramming/AST in Groovy
         </ol>
       </section>
 <section>
-MetaProgramming is not recent
-In Lisp in the 60s
-In C with macros
-In the JVM world it has gained some interest since apt limited features and emergence of new languages like Groovy or Clojure
+<h3>MetaProgramming is not recent</h3>
+<hr />
+<ul>
+<li>Lisp ... in the 60s!</li>
+<li>C with macros</li>
+<br/>
+<li>In JVM world, it has gained some interest:<ul>
+<li>apt (limited features)</li>
+<li>Emergence of new languages like Groovy or Clojure</li>
+</ul>
+</li>
+</ul>
 </section>
 <section>
-A use case for this session
-Custom creation of scripts submitted by end users that are going to be executed later
-Some constraints:
-local development 
-API constraints
-Security/Sandboxing
-DSL capabilities
+<section>
+<h3>A use case for this session</h3>
+<hr/>
+<div>Custom creation of scripts:</div>
+<br/>
+<ul>
+<li>submitted by end users</li>
+<li>executed later</li>
+</ul>
 </section>
 <section>
-How to create Compiler plugins
-some infra
-sbt
-plugin.xml
+<div>
+<h3>Some constraints:</h3>
+<hr/>
+<ul>
+<li>local development</li>
+<li>API interaction constraints</li>
+<li>Security/Sandboxing</li>
+<li>DSL capabilities</li>
+</ul>
+</div>
+</section>
 </section>
 <section>
-How does the AST look like in Scala
-show raw
+<section>
+<h3>How to create Compiler plugins</h3>
+<hr/>
+<p><small><a href="http://www.scala-lang.org/old/node/140">http://www.scala-lang.org/old/node/140</a></small></p>
+</section>
+<section>
+<h3>When to write a plugin</h3>
+<hr/>
+<div style="text-align:left">Modify the compiler's behavior</div>
+<div style="text-align:left">Should not be so frequent</div>
+<br/>
+<ul>
+<li>add additional compile-time checks</li>
+<li>add compile-time optimizations</li>
+<li>rewrite Scala syntax into an entirely different, custom meaning
+<ul><li>Dangerous =&gt; Of course ... we're going to play a bit with ;)</li></ul
+</li>
+</ul>
+</section>
+<section>
+<ol>
+<li>Create a java archive containing a scalac-plugin.xml</li>
+<li>Define inside which class is your plugin entry point</li>
+<li>Your code can be in the same jar (for small plugins) or as separated projects that you add in your project dependencies</li>
+</ol>
+<br/>
+<pre><code>&lt;plugin&gt;
+  &lt;name&gt;myPluginName&lt;/name&gt;
+  &lt;classname&gt;my.package.path.MyPlugin&lt;/classname&gt;
+&lt;/plugin&gt;</code></pre>
+</section>
+<section>
+<div style="text-align:left">Use packages under scala.tools.nsc</div>
+<br/>
+<div style="text-align:left">Particularly Global, Phase classes</div>
+<div style="text-align:left">Plugin, PluginComponent inside the plugins package</div>
+</section>
+<section>
+First create your plugin class:
+<br/>
+<pre><code>class MyPlugin(val global: Global) extends Plugin {
+  import global._
 
-http://docs.scala-lang.org/overviews/reflection/overview.html
+  val name = "myplugin"
+  val description = "Provide a description"
+  val components = List[PluginComponent](MyComponent)
+</code></pre>
+</section>
+<section>
+Define the previously referenced Component:
+<br/>
+<pre><code>private object MyComponent extends PluginComponent {
+  val runsAfter = List[String]("refchecks");
+  //override val runsBefore = List[String]("tailcalls");
 
-import scala.reflect.runtime.universe._
+  val phaseName = MyPlugin.this.name
+  def newPhase(_prev: Phase) = new MyPhase(_prev)    
+</code></pre>
+</section>
+<section>
+Finally define your phase
+
+<pre><code>class MyPhase(prev: Phase) extends StdPhase(prev) {
+  override def name = MyPlugin.this.name
+
+  def apply(unit: CompilationUnit) {
+    // Here starts the AST analysis
+</code></pre>
+</section>
+<section>
+<h3>How to use your plugin</h3>
+<hr/>
+<ul>
+<li>scala-compiler.jar in the class path</li>
+<li>pass the -Xplugin: or -Xpluginsdir argument</li>
+</ul
+<br/>
+<div>You also can use sbt http://www.scala-sbt.org/0.13.0/docs/Detailed-Topics/Compiler-Plugins.html</div>
+<pre><code>autoCompilerPlugins := true
+
+//addCompilerPlugin("org.scala-lang.plugins" % "continuations" % "2.10.3")
+
+libraryDependencies +=
+    compilerPlugin("org.scala-lang.plugins" % "continuations" % scalaVersion.value)
+
+
+scalacOptions += "-P:continuations:enable"
+</code></pre>
+</section>
+<section>
+<h3>Useful Compiler Options</h3>
+<hr/>
+<div style="text-align:left">use scalac -X</div>
+<br/>
+<div style="text-align:left">For example</div>
+<ul>
+<li>-Xshow-phases</li>
+<li>-Xplugin-list</li>
+</ul>
+</section>
+<section>
+<h3>Customize plugin with options</h3>
+<hr/>
+<div style="text-align:left">Adding your own command line  options</div>
+<br/>
+<div style="text-align:left">-P: followed by the name of the plugin. For example, -P:continuations:enable</div>
+<pre><code>override def processOptions(
+  options: List[String],
+  error: String =&gt; Unit)
+
+override val optionsHelp: Option[String]
+</code></pre>
+</section>
+</section>
+<section>
+<h3>How does the AST look like in Scala</h3>
+<hr/>
+<div>Use show raw</div>
+<div>http://docs.scala-lang.org/overviews/reflection/overview.html</div>
+<pre><code>import scala.reflect.runtime.universe._
 
 def tree = reify { final class C { def x = 2 } }.tree
+
 show(tree)
-howRaw(tree)
+showRaw(tree)
+</code></pre>
 
 Class ValDef
 Expr
@@ -149,62 +282,56 @@ Apply
 ClassDef
 
 
-    Subclasses of TermTree which represent terms, e.g., method invocations are represented by Apply nodes, object instantiation is achieved using New nodes, etc.
-    Subclasses of TypTree which represent types that are explicitly specified in program source code, e.g., List[Int] is parsed as AppliedTypeTree. Note: TypTree is not misspelled, nor is it conceptually the same as TypeTree– TypeTree is something different. That is, in situations where Types are constructed by the compiler (_e.g.,_ during type inference), they can be wrapped in TypeTree trees and integrated into the AST of the program.
-    Subclasses of SymTree which introduce or reference definitions. Examples of the introduction of new definitions include ClassDefs which represent class and trait definitions, or ValDef which represent field and parameter definitions. Examples of the reference of existing definitions include Idents which refer to an existing definition in the current scope such as a local variable or a method.
+Subclasses of TermTree which represent terms, e.g., method invocations are represented by Apply nodes, object instantiation is achieved using New nodes, etc.
+Subclasses of TypTree which represent types that are explicitly specified in program source code, e.g., List[Int] is parsed as AppliedTypeTree. 
+Note: TypTree is not misspelled, nor is it conceptually the same as TypeTree
+TypeTree is something different. That is, in situations where Types are constructed by the compiler 
+(_e.g.,_ during type inference), they can be wrapped in TypeTree trees and integrated into the AST of the program.
+
+Subclasses of SymTree which introduce or reference definitions.
+Examples of the introduction of new definitions include ClassDefs which represent class and trait definitions, or ValDef which represent 
+field and parameter definitions. Examples of the reference of existing definitions include Idents which refer to an existing definition in 
+the current scope such as a local variable or a method.
 
     
 </section>
 <section>
+<section>
+<h3>Visiting the AST</h3>
+<hr/>
 Manual
 Pattern Matching
-
-Visiting with Traverser
-
-Traversal via Traverser
-
-In situations where it’s necessary to traverse an entire tree from top to bottom, using traversal via pattern matching would be infeasible– to do it this way, one must individually handle every type of node that we might come across in the pattern match. Thus, in these situations, typically class Traverser is used.
-
-Traverser makes sure to visit every node in a given tree, in a breadth-first search.
-
-To use a Traverser, simply subclass Traverser and override method traverse. In doing so, you can simply provide custom logic to handle only the cases you’re interested in. For example, if, given our x.$plus(2).$plus(3) tree from the previous section, we would like to collect all Apply nodes, we could do:
-
-    scala> import scala.reflect.runtime.universe._
-    import scala.reflect.runtime.universe._
-    scala> val tree = Apply(Select(Apply(Select(Ident(newTermName("x")), newTermName("$plus")), List(Literal(Constant(2)))), newTermName("$plus")), List(Literal(Constant(3))))
-    tree: reflect.runtime.universe.Apply = x.$plus(2).$plus(3)
-    scala> object traverser extends Traverser {
-    | var applies = List[Apply]()
-    | override def traverse(tree: Tree): Unit = tree match {
-    | case app @ Apply(fun, args) =>
-    | applies = app :: applies
-    | super.traverse(fun)
-    | super.traverseTrees(args)
-    | case _ => super.traverse(tree)
-    | }
-    | }
-    defined module traverser
-
-In the above, we intend to construct a list of Apply nodes that we find in our given tree.
-
-We achieve this by in effect adding a special case to the already breadth-first traverse method defined in superclass Traverser, via subclass traverser’s overridden traverse method. Our special case affects only nodes that match the pattern Apply(fun, args), where fun is some function (represented by a Tree) and args is a list of arguments (represented by a list of Trees).
-
-When a the tree matches the pattern (_i.e.,_ when we have an Apply node), we simply add it to our List[Apply], applies, and continue our traversal.
-
-Note that, in our match, we call super.traverse on the function fun wrapped in our Apply, and we call super.traverseTrees on our argument list args (essentially the same as super.traverse, but for List[Tree] rather than a single Tree). In both of these calls, our objective is simple– we want to make sure that we use the default traverse method in Traverser because we don’t know whether the Tree that represents fun contains our Apply pattern– that is, we want to traverse the entire sub-tree. Since the Traverser superclass calls this.traverse, passing in every nested sub- tree, eventually our custom traverse method is guaranteed to be called for each sub-tree that matches our Apply pattern.
-
-To trigger the traverse and to see the resulting List of matching Apply nodes, simply do:
-
-    scala> traverser.traverse(tree)
-    scala> traverser.applies
-    res0: List[reflect.runtime.universe.Apply] = List(x.$plus(2), x.$plus(2).$plus(3))
-    
 </section>
 <section>
+<h3>Visiting with Traverser</h3>
+<hr/>
+<div>Traverser makes sure to visit every node in a given tree, in a breadth-first search.</div>
+
+To use a Traverser, simply subclass Traverser and override method traverse. In doing so, you can simply provide custom logic to handle only the cases
+ you're interested in. 
+ 
+object traverser extends Traverser {
+override def traverse(tree: Tree): Unit = tree match {
+ case app @ Apply(fun, args) =&gt;
+    //Some logic  
+    //super.traverse(fun)
+    //super.traverseTrees(args)
+  case _ =&gt; super.traverse(tree)
+  }
+}
+// Todo 2 use cases
+// API recording
+// System.exit call
+</section>    
+</section>
+<section>
+<section>
+<h3>Modifying the AST</h3>
+<hr/>
 Manual
+</section>
+<section>
 Quasiquotes
-
-
 
 Quasiquotes are shipped with recent milestone builds of Scala 2.11, starting from 2.11.0-M4. They are also available in Scala 2.10 with the macro paradise plugin. Follow the instructions at the “Macro Paradise” page to download and use our compiler plugin.
 
@@ -284,10 +411,9 @@ To simplify splicing of non-trees, quasiquotes provide the Liftable type class, 
     }
 
 
-
+</section>
+<section>
 Reify
-
-
 
 Tree Creation via reify
 
@@ -330,6 +456,8 @@ Note, however, that there is a requirement for the argument of reify to be valid
 As we can see, the compiler assumes that we wanted to reify a call to println with no arguments, when what we really wanted was to capture the name of the function to be called.
 
 These types of use-cases are currently inexpressible when using reify.
+</section>
+<section>
 Tree Creation via parse on ToolBoxes
 
 Toolboxes can be used to typecheck, compile, and execute abstract syntax trees. A toolbox can also be used to parse a string into an AST.
@@ -394,6 +522,12 @@ Our earlier example involving println(2) can be manually constructed as follows:
     res0: reflect.runtime.universe.Apply = println(2)
 
 The canonical use case for this technique is when the target tree needs to be assembled from dynamically created parts, which don’t make sense in isolation from one another. In that case, reify will most likely be inapplicable, because it requires its argument to be typeable. parse might not work either, since quite often, trees are assembled on sub-expression level, with individual parts being inexpressible as Scala sources.
+</section>
+<section>
+Other options
+Transformer
+NodeTree
+</section>
 </section>
       <section>
       <section>
