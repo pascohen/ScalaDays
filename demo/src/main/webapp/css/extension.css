@@ -24,3 +24,8 @@ textarea.codeoutput {
 	color: white;
 	readonly: true;
 }
+
+small {
+  position: relative;
+  top: 6px;
+ }
