@@ -35,7 +35,6 @@
             margin:0;
             padding:0;
 	    text-align:left;
-
 	    font-family: 'Monaco','Menlo','Ubuntu Mono','Consolas','source-code-pro',monospace;
          }
 
@@ -63,7 +62,8 @@
          <section>
             <h3>Let's consider that Java Code</h3>
 	    <hr />
-<pre><code>public class ImmutableClass {
+<pre><code>
+public class ImmutableClass {
    private String field1;
    private int    field2;
 
@@ -74,27 +74,30 @@
 
    public String getField1() { return field1; }
    public int getField2()    { return field2; }
-}</code>
-</pre>
+}
+
+</code></pre>
 Pffeeeew ... much code
 	 </section>
          <section>
             <h3>Let's make it simpler</h3>
 	    <hr />
-<pre><code>@Immutable class ImmutableClass {
+<pre><code>
+@Immutable class ImmutableClass {
    String field1;
    int    field2;
-}</code>
-</pre>
-Ok much better
-Thanks to Metaprogramming/AST in Groovy
+}
+
+</code></pre>
+Ok much better, thanks to Metaprogramming/AST in Groovy
 	 </section>
          <section>
             <h3>Ok ... in Scala there are classes ;)</h3>
 	    <hr />
-<pre><code>case class ImmutableClass(val String field1, val Int field2)
-</code>
-</pre>
+<pre><code>
+class ImmutableClass(val String field1, val Int field2)
+
+</code></pre>
 	 </section>
       </section>
       <section>
@@ -120,7 +123,7 @@ Thanks to Metaprogramming/AST in Groovy
 <li>In JVM world, it has gained some interest:<ul>
 <li>apt (limited features)</li>
 <li>Emergence of new languages like Groovy or Clojure</li>
-<li>or Scala</li>
+<li>or, of course, Scala</li>
 </ul>
 </li>
 </ul>
@@ -170,6 +173,8 @@ Thanks to Metaprogramming/AST in Groovy
 </ul>
 </section>
 <section>
+<h3>Steps to follow #1: xml definition</h3>
+<hr/>
 <ol>
 <li>Create a java archive containing a scalac-plugin.xml</li>
 <li>Define inside which class is your plugin entry point</li>
@@ -182,44 +187,56 @@ Thanks to Metaprogramming/AST in Groovy
 &lt;/plugin&gt;</code></pre>
 </section>
 <section>
-First create your plugin class:
-<br/>
-<pre><code>class MyPlugin(val global: Global) extends Plugin {
+<h3>Steps to follow #2: Plugin class</h3>
+<hr/>
+<pre><code>
+class MyPlugin(val global: Global) extends Plugin {
   val name = "myplugin"
   val description = "Provide a description"
   val components = List[PluginComponent](MyComponent)
+
 </code></pre>
 </section>
 <section>
-Define the previously referenced Components:
-<br/>
-<pre><code>private object MyComponent extends PluginComponent {
+<h3>Steps to follow #3: Components</h3>
+<hr/>
+<pre><code>
+private object MyComponent extends PluginComponent {
   val runsAfter = List[String]("refchecks");
   //override val runsBefore = List[String]("tailcalls");
 
   val phaseName = MyPlugin.this.name
   def newPhase(_prev: Phase) = new MyPhase(_prev)    
+
 </code></pre>
 </section>
 <section>
-Finally define your phase
-
-<pre><code>class MyPhase(prev: Phase) extends StdPhase(prev) {
+<h3>Steps to follow #4: Phase defintion</h3>
+<hr/>
+<pre><code>
+class MyPhase(prev: Phase) extends StdPhase(prev) {
   override def name = MyPlugin.this.name
 
   def apply(unit: CompilationUnit) {
     // Here starts the AST analysis
+
 </code></pre>
 </section>
 <section>
 <h3>How to use your plugin</h3>
 <hr/>
+<div style="text-align:left">
 <ul>
-<li>scala-compiler.jar in the class path</li>
+<li>add scala-compiler.jar in the class path</li>
 <li>pass the -Xplugin: or -Xpluginsdir argument</li>
 </ul>
+</div>
 <br/>
-<div>You also can use sbt http://www.scala-sbt.org/0.13.0/docs/Detailed-Topics/Compiler-Plugins.html</div>
+<div style="text-align:left">
+<div>You also can use sbt:</div>
+<div><small><a href="http://www.scala-sbt.org/0.13.0/docs/Detailed-Topics/Compiler-Plugins.html">http://www.scala-sbt.org/0.13.0/docs/Detailed-Topics/Compiler-Plugins.html</a></small></div>
+</div>
+<br/>
 <pre><code>autoCompilerPlugins := true
 
 //addCompilerPlugin("org.scala-lang.plugins" % "continuations" % "2.10.3")
@@ -233,20 +250,26 @@ scalacOptions += "-P:continuations:enable"
 <section>
 <h3>Useful Compiler Options</h3>
 <hr/>
-<div style="text-align:left">use scalac -X</div>
+<div style="text-align:left">
+<div>use scalac -X</div>
 <br/>
-<div style="text-align:left">For example</div>
+<div>For example:</div>
 <ul>
 <li>-Xshow-phases</li>
 <li>-Xplugin-list</li>
 </ul>
+</div>
 </section>
 <section>
 <h3>Customize plugin with options</h3>
 <hr/>
-<div style="text-align:left">Adding your own command line options</div>
+<div style="text-align:left">
+<div>Adding your own command line options:</div>
+<div>-P: followed by the name of the plugin.</div>
 <br/>
-<div style="text-align:left">-P: followed by the name of the plugin. For example, -P:continuations:enable</div>
+<div>For example, -P:continuations:enable</div>
+<br/>
+</div>
 <pre><code>override def processOptions(
   options: List[String],
   error: String =&gt; Unit)
@@ -259,26 +282,27 @@ override val optionsHelp: Option[String]
 <section>
 <h3>How does the AST look like in Scala</h3>
 <hr/>
-<div>http://docs.scala-lang.org/overviews/reflection/overview.html</div>
-<pre><code>import scala.reflect.runtime.universe._
+<div><small><a href="http://docs.scala-lang.org/overviews/reflection/overview.html">http://docs.scala-lang.org/overviews/reflection/overview.html</a></small></div>
+<br/>
+<pre><code>
+import scala.reflect.runtime.universe._
 
 def tree = reify { // some code }.tree
 
 show(tree)
 showRaw(tree)
+
 </code></pre>
 </section>
 <section>
-Subclasses of TermTree which represent terms
-Subclasses of TypTree which represent types
-Subclasses of SymTree which introduce or reference definitions.
-
-Class ValDef
-Expr
-Apply
-ClassDef
-Block
-Constant
+<div>Trees trait</div>
+<ul>
+<li>Subclasses of TermTree which represent terms</li>
+<li>Subclasses of TypTree which represent types</li>
+<li>Subclasses of SymTree which introduce or reference definitions.</li>
+</ul>
+<div>Few examples</div>
+ValDef, Expr,Apply, ClassDef, Block, Literal, Constant
 </section>
 </section>
 <section>
@@ -296,7 +320,7 @@ Pattern Matching
 To use a Traverser, simply subclass Traverser and override method traverse. In doing so, you can simply provide custom logic to handle only the cases
  you're interested in. 
  
-object traverser extends Traverser {
+<pre><code>object traverser extends Traverser {
 override def traverse(tree: Tree): Unit = tree match {
  case app @ Apply(fun, args) =&gt;
     //Some logic  
@@ -304,8 +328,7 @@ override def traverse(tree: Tree): Unit = tree match {
     //super.traverseTrees(args)
   case _ =&gt; super.traverse(tree)
   }
-}
-
+}</code></pre>
 </section>
 <section>
 // Todo 2 use cases
@@ -313,7 +336,7 @@ override def traverse(tree: Tree): Unit = tree match {
 // System.exit call
 We are in Scala so we must rely on type
 
-for (global.Apply(fun, _) &lt;- unit.body) {
+<pre><code>for (global.Apply(fun, _) &lt;- unit.body) {
             fun.symbol match {
               case method: global.MethodSymbol =&gt;
                 val classSymbol = method.owner
@@ -322,7 +345,7 @@ for (global.Apply(fun, _) &lt;- unit.body) {
                   &amp;&amp; (classSymbol.tpe &lt;:&lt; systemSymbol.tpe))
                   unit.error(fun.pos, "System.exit forbidden")
               case _ =&gt; ()
-
+</code></pre>
 </section>    
 </section>
 <section>
@@ -330,137 +353,62 @@ for (global.Apply(fun, _) &lt;- unit.body) {
 <h3>Modifying the AST</h3>
 <hr/>
 Manual
+NodeTree DSL
 </section>
 <section>
-Quasiquotes
+<h3>Tree Creation via reify/splice</h3>
+<hr/>
+Method reify simply takes a Scala expression as an argument, and produces that argument’s typed Tree representation as a result. cf previously
 
-Liftable
+Code example
 
-Liftable type class, which defines how values are transformed into trees when spliced in. 
-We provide instances of Liftable for primitives and strings, which wrap those in Literal(Constant(...)). You might want to define your own instances for simple case classes and lists.
-
-    trait Liftable[T] {
-    def apply(universe: api.Universe, value: T): universe.Tree
-    }
-
-
-</section>
-<section>
-Reify
-
-Tree Creation via reify
-
-Method reify simply takes a Scala expression as an argument, and produces that argument’s typed Tree representation as a result.
-
-Tree creation via method reify is the recommended way of creating trees in Scala Reflection. To see why, let’s start with a small example:
-
-    scala> import scala.reflect.runtime.universe._
-    import scala.reflect.runtime.universe._
-    scala> { val tree = reify(println(2)).tree; showRaw(tree) }
-    res0: String = Apply(Select(Select(This(newTypeName("scala")), newTermName("Predef")), newTermName("println")), List(Literal(Constant(2))))
-
-Here, we simply reify the call to println(2)– that is, we convert the expression println(2) to its corresponding tree representation. Then we output the raw tree. Note that the println method was transformed to scala.Predef.println. Such transformations ensure that regardless of where the result of reify is used, it will not unexpectedly change its meaning. For example, even if this println(2) snippet is later inserted into a block of code that defines its own println, it wouldn’t affect the behavior of the snippet.
-
-This way of creating trees is thus hygenic, in the sense that it preserves bindings of identifiers.
 Splicing Trees
 
-Using reify also allows one to compose trees from smaller trees. This is done using Expr.splice.
+Code example
 
-Note: Expr is reify’s return type. It can be thought of as a simple wrapper which contains a typed Tree, a TypeTag and a handful of reification-relevant methods, such as splice. For more information about Exprs, see the relevant section of this guide.
-
-For example, let’s try to construct a tree representing println(2) using splice:
-
-    scala> val x = reify(2)
-    x: reflect.runtime.universe.Expr[Int(2)] = Expr[Int(2)](2)
-    scala> reify(println(x.splice))
-    res1: reflect.runtime.universe.Expr[Unit] = Expr[Unit](scala.this.Predef.println(2))
-
-Here, we reify 2 and println separately, and simply splice one into the other.
-
-Note, however, that there is a requirement for the argument of reify to be valid and typeable Scala code. If instead of the argument to println we wanted to abstract over the println itself, it wouldn’t be possible:
-
-    scala> val fn = reify(println)
-    fn: reflect.runtime.universe.Expr[Unit] = Expr[Unit](scala.this.Predef.println())
-    scala> reify(fn.splice(2))
-    <console>:12: error: Unit does not take parameters
-    reify(fn.splice(2))
-    ^
-
-As we can see, the compiler assumes that we wanted to reify a call to println with no arguments, when what we really wanted was to capture the name of the function to be called.
-
-These types of use-cases are currently inexpressible when using reify.
-</section>
-<section>
-Tree Creation via parse on ToolBoxes
-
-Toolboxes can be used to typecheck, compile, and execute abstract syntax trees. A toolbox can also be used to parse a string into an AST.
-
-Note: Using toolboxes requires scala-compiler.jar to be on the classpath.
-
-Let’s see how parse deals with the println example from the previous section:
-
-    scala> import scala.reflect.runtime.universe._
-    import scala.reflect.runtime.universe._
-    scala> import scala.tools.reflect.ToolBox
-    import scala.tools.reflect.ToolBox
-    scala> val tb = runtimeMirror(getClass.getClassLoader).mkToolBox()
-    tb: scala.tools.reflect.ToolBox[reflect.runtime.universe.type] = scala.tools.reflect.ToolBoxFactory$ToolBoxImpl@7bc979dd
-    scala> showRaw(tb.parse("println(2)"))
-    res2: String = Apply(Ident(newTermName("println")), List(Literal(Constant(2))))
-
-It’s important to note that, unlike reify, toolboxes aren’t limited by the typeability requirement– although this flexibility is achieved by sacrificing robustness. That is, here we can see that parse, unlike reify, doesn’t reflect the fact that println should be bound to the standard println method.
-
-Note: when using macros, one shouldn’t use ToolBox.parse. This is because there’s already a parse method built into the macro context. For example:
-
-    scala> import language.experimental.macros
-    import language.experimental.macros
-    scala> def impl(c: scala.reflect.macros.Context) = c.Expr[Unit](c.parse("println(2)"))
-    impl: (c: scala.reflect.macros.Context)c.Expr[Unit]
-    scala> def test = macro impl
-    test: Unit
-    scala> test
-    2
-
-Typechecking with ToolBoxes
-
-As earlier alluded to, ToolBoxes enable one to do more than just constructing trees from strings. They can also be used to typecheck, compile, and execute trees.
-
-In addition to outlining the structure of the program, trees also hold important information about the semantics of the program encoded in symbol (a symbol assigned to trees that introduce or reference definitions), and tpe (the type of the tree). By default these fields are empty, but typechecking fills them in.
-
-When using the runtime reflection framework, typechecking is implemented by ToolBox.typeCheck. When using macros, at compile time one can use the Context.typeCheck method.
-
-    scala> import scala.reflect.runtime.universe._
-    import scala.reflect.runtime.universe._
-    scala> val tree = reify { "test".length }.tree
-    tree: reflect.runtime.universe.Tree = "test".length()
-    scala> import scala.tools.reflect.ToolBox
-    import scala.tools.reflect.ToolBox
-    scala> val tb = runtimeMirror(getClass.getClassLoader).mkToolBox()
-    tb: scala.tools.reflect.ToolBox[reflect.runtime.universe.type] = ...
-    scala> val ttree = tb.typeCheck(tree)
-    ttree: tb.u.Tree = "test".length()
-    scala> ttree.tpe
-    res5: tb.u.Type = Int
-    scala> ttree.symbol
-    res6: tb.u.Symbol = method length
-
-Here, we simply create a tree that represents a call to "test".length, and use ToolBox tb’s typeCheck method to typecheck the tree. As we can see, ttree gets the correct type, Int, and its Symbol is correctly set.
-Tree Creation via Manual Construction
-
-If all else fails, one can manually construct trees. This is the most low-level way to create trees, and it should only be attempted if no other approach works. It sometimes offers greater flexibility when compared with parse, though this flexibility is achieved at a cost of excessive verbosity and fragility.
-
-Our earlier example involving println(2) can be manually constructed as follows:
-
-    scala> Apply(Ident(newTermName("println")), List(Literal(Constant(2))))
-    res0: reflect.runtime.universe.Apply = println(2)
-
-The canonical use case for this technique is when the target tree needs to be assembled from dynamically created parts, which don’t make sense in isolation from one another. In that case, reify will most likely be inapplicable, because it requires its argument to be typeable. parse might not work either, since quite often, trees are assembled on sub-expression level, with individual parts being inexpressible as Scala sources.
+<pre><code>val x = reify(2)
+reify(println(x.splice))</code></pre>
 </section>
 <section>
 Other options
 Transformer
 TypingTransformer
-NodeTree
+</section>
+<section>
+<h3>Tree Creation via parse on ToolBoxes</h3>
+<hr/>
+Toolboxes can be used to typecheck, compile, and execute abstract syntax trees. 
+A toolbox can also be used to parse a string into an AST.
+
+Let’s see how parse deals with the println example from the previous section:
+<pre><code>import scala.reflect.runtime.universe._
+import scala.tools.reflect.ToolBox
+
+val tb = runtimeMirror(getClass.getClassLoader).mkToolBox()
+
+showRaw(tb.parse("println(2)"))</code></pre>
+
+
+Typechecking with ToolBoxes
+
+<pre><code>import scala.reflect.runtime.universe._
+val tree = reify { "test".length }.tree
+
+import scala.tools.reflect.ToolBox
+val tb = runtimeMirror(getClass.getClassLoader).mkToolBox()
+
+scala.tools.reflect.ToolBox[reflect.runtime.universe.type] = ...
+
+val ttree = tb.typeCheck(tree)
+
+ttree.tpe
+ttree.symbol</code></pre>
+</section>
+<section>
+<h3>Quasiquotes</h3>
+<hr/>
+<div>Liftable</div>
+Liftable type class, which defines how values are transformed into trees when spliced in. 
 </section>
 </section>
       <section>
@@ -472,7 +420,9 @@ NodeTree
 <hr/>
 <ul>
 <li>Presentation embedded inside a server</li>
+<br/>
 <li>The next eval page just sends code to the server - Ajax</li>
+<br/>
 <li>A scala Eval instance is spawned
 <ul><li>Loads jars from a dedicated lib directory</li>
 <li>Uses plugins from another dir</li>
@@ -497,12 +447,50 @@ NodeTree
         </section>
 	</section>
 	<section>
-AST is too complex and error prone
-Are there alternatives to solve the different use cases
-Macros
-JAAS - sandboxing - not sure it is really easy and here we can have a granularity in sandboxing
-Traits AOP
-Futures
+	<section>
+	<h3>Alternatives to compiler plugins</h3>
+	<hr/>
+<div>AST is definitely powerful</div>
+<div>but complex and error prone</div>
+<br/>
+<div>Are there alternatives to solve the different use cases?</div>
+</section>
+<section>
+<h3>Using AOP - traits</h3>
+<hr/>
+<div style="text-align:left">
+<div>Replace visitor and enable some kinds of transformations</div>
+<br/>
+<div style="text-decoration: underline">Drawback:</div>
+<ul><li>Done at runtime
+<ul><li>=&gt; potential perf impact</li></ul>
+</li></ul>
+</section>
+<section>
+<h3>Using Macros</h3>
+<hr/>
+<div style="text-align:left">
+<div>Simplify and focus the scope of AST manipulation</div>
+<div>Interesting to apply some kinds of transformations:</div>
+<div><ul><li>macro annotations to rewrite some part of the code</li></ul></div>
+<br/>
+<div style="text-decoration: underline">Drawback:</div>
+<div>Macros have to be called or require some plumbing to be used</div>
+<div>Remains close to AST manipulation</div>
+</div>
+</section>
+<section>
+<h3>Using JAAS as a sandboxing mechanism</h3>
+<hr/>
+<div style="text-align:left">
+<div>Focus on security replacement</div>
+<br/>
+<div style="text-decoration: underline">Drawbacks:</div>
+<ul><li>Not so easy replacement</li>
+<li>Discovering at runtime</li>
+<li>Granularity of the sandboxing</li>
+</ul>
+</section>
 </section>
 <section>
 <section>
@@ -533,7 +521,7 @@ Futures
       <section>
       <h3>Further reading</h3>
       <ul>
-	      <li><small><a href="http://www.scala-lang.org/old/node/140">http://www.scala-lang.org/old/node/140</a> - marked as deprecated</small></li>
+	      <li><small><a href="http://www.scala-lang.org/old/node/140">http://www.scala-lang.org/old/node/140</a></small></li>
       <li><small><a href="http://docs.scala-lang.org/overviews/reflection/overview.html">http://docs.scala-lang.org/overviews/reflection/overview.html</a></small></li>
       <li><small><a href="http://lampsvn.epfl.ch/trac/scala/browser/scala/trunk/docs/examples/plugintemplate">http://lampsvn.epfl.ch/trac/scala/browser/scala/trunk/docs/examples/plugintemplate</a></small></li>
       <li><small><a href="http://www.scala-lang.org/files/archive/nightly/docs-master/compiler/#scala.tools.nsc.Global">http://www.scala-lang.org/files/archive/nightly/docs-master/compiler/#scala.tools.nsc.Global</a></small></li>

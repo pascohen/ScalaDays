@@ -63,7 +63,7 @@ public class EvalController {
 
 		try {
 			Evaluator evaluator = new Evaluator(printStream);
-			evaluator.withContinuations();
+			//evaluator.withContinuations();
 			evaluator
 			      .withPluginsDir("/home/pcohen/workspace/scala211/ScalaDays/plugins");
 			evaluator.withLibsDir("/home/pcohen/workspace/scala211/ScalaDays/jars");

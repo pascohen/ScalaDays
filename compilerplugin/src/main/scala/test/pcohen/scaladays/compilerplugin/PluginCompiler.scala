@@ -12,23 +12,11 @@ import scala.tools.nsc.ast.TreeDSL
 class PluginCompiler(val global: Global) extends Plugin {
 
   val name = "demoplugin"
-  val description = "Demo plugin"
-  val components = List[PluginComponent](FilterComponent)
+  override val description = "Demo plugin"
+  private[this] val registerComponent = RegisterComponent(name,global)
+  private[this] val filterComponent = FilterComponent(name,global)
+  private[this] val dslTransformer = DSLTransformerComponent(name,global)
+  private[this] val logAdder = LogAdderComponent(name,global)
 
-  private object FilterComponent extends PluginComponent {
-    val global: PluginCompiler.this.global.type = PluginCompiler.this.global
-
-    val runsAfter = List[String]("refchecks");
-
-    val phaseName = "filter"
-    def newPhase(prev: Phase): Phase = new FilterPhase(prev)
-
-    class FilterPhase(prev: Phase) extends StdPhase(prev) {
-      override def name = PluginCompiler.this.name
-
-      def apply(unit: global.CompilationUnit) {
-        println("=============== CompilerV33 plugin Handling "+unit)
-      }
-    }
-  }
+  val components = List[PluginComponent](registerComponent,filterComponent,dslTransformer,logAdder)
 }
