@@ -9,8 +9,7 @@ object LogAdderComponent {
   def apply(name: String, global: Global) = new LogAdderComponent(name, global)
 }
 
-class LogAdderComponent(val name: String, val global: Global) extends PluginComponent with Transform 
-{
+class LogAdderComponent(val name: String, val global: Global) extends PluginComponent with Transform {
 
   val runsAfter = List[String]("refchecks");
   override val description = "Add logging component"
@@ -24,29 +23,51 @@ class LogAdderComponent(val name: String, val global: Global) extends PluginComp
 
     def handle(m: Tree): Tree = {
       println(" === Handling " + m)
-      //val a1 = typer.typed(reify {val t1 = System.currentTimeMillis();println("T1") }.tree)
-      //val a2 = typer.typed(reify {val t2 = System.currentTimeMillis();println("T2") }.tree)
-      //val a3 = reify { println("Call of "+m+" took "+((t2-t1)/1000)) }
-      val a1 = reify { println("T1") }.tree
-      /*      val resultTermName = TermName("result")*/
-     //m
-     // typer.typed(a1)
-     //typer.typed(a1.tree)
-      //a1
-      Block()
+
+      /*val a1 = q"""
+      val t1 = System.currentTimeMillis();println("T1")
+      $m
+     val t2 = System.currentTimeMillis();println("T2")
+     println("Call of "+m+" took "+((t2-t1)/1000))
+      """*/
+      
+      val a1 = q"""
+          val t1:Int = 22
+          $m
+          val t2:Int = 43
+          
+    """
+      typer.typed(a1)
     }
 
     def postTransform(tree: global.Tree): global.Tree = {
       tree match {
-        case Apply(fun, _) =>
+        /* case Apply(fun, _) =>
           fun.symbol match {
             case m: global.MethodSymbol =>
-              if (!(m.owner.tpe =:= tree.tpe)) { //Honnetement c est nimp
-              handle(tree)
+              if (fun.symbol.nameString.contains("myMeth")) { //Honnetement c est nimp
+                handle(tree)
               } else tree
             case _ => tree
-          }
-        case _ => tree
+          }*/
+        case ValDef(_, _, _, Ident(TermName(n))) =>
+          println("A " + n)
+          if (n.contains("myMeth"))
+            handle(tree)
+          else tree
+        case ValDef(_, _, _, Apply(Ident(TermName(n)), _)) =>
+          println("B " + n)
+          if (n.contains("myMeth"))
+            handle(tree)
+          else tree
+        case ValDef(_, _, _, Apply(Select(_, TermName(n)), _)) =>
+          println("C " + n)
+          if (n.contains("myMeth"))
+            handle(tree)
+          else tree
+        case _ =>
+          //println("C "+global.showRaw(tree))
+          tree
       }
     }
 

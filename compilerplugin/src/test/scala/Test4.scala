@@ -1,9 +1,9 @@
 object Test4 extends App {
-  def f(x: Int) = x + 1
-  def g(s: String) = s + "_suffix"
+  def myMeth1(x: Int) = x + 1
+  def myMeth2(s: String) = s + "_suffix"
 
-  val i = f(10)
-  val j = g("b")
+  val i = myMeth1(10)
+  val j = myMeth2("b")
 
   println("I = " + i)
   println("J = " + j)
