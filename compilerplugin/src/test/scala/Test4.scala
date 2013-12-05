@@ -1,16 +1,14 @@
-class C {
- def myMethod(i: Int) = {
-   println("Calling myMethod with "+i)
-   i + 1
-}
-
-def call() = {
-	myMethod(10)
-}
-}
 
 object Test4 extends App {
  
-val c = new C
-c.call()
+  def myMethod(i: Int) = {
+   println("Calling myMethod with "+i)
+   i + 1
+}
+  
+  myMethod(2)
+
+val i = myMethod(210)
+
+println(i)
 }

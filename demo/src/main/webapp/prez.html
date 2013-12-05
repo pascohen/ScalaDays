@@ -209,6 +209,7 @@ private object MyComponent extends PluginComponent {
   def newPhase(_prev: Phase) = new MyPhase(_prev)    
 
 </code></pre>
+<div>By default, Scala defines 25 phases!</div>
 </section>
 <section>
 <h3>Steps to follow #4: Phase defintion</h3>
@@ -295,31 +296,76 @@ showRaw(tree)
 </code></pre>
 </section>
 <section>
-<div>Trees trait</div>
+<h3>A simple example</h3>
+<hr/>
+<pre><code>
+reify { val i = 10
+        println("I = "+i)
+      }
+      
+</code></pre>
+transforms to
+<pre><code>
+Block(
+List(ValDef(Modifiers(), TermName("i"), TypeTree(), 
+     Literal(Constant(10)))), 
+     
+Apply(Select(Ident(scala.Predef), TermName("println")), 
+      List(Apply(Select(Literal(Constant("I = ")), 
+                 TermName("$plus")), 
+                 List(Ident(TermName("i"))))))
+)
+
+</code></pre>
+</section>
+<section>
+<h3>Categories in the AST</h3>
+<hr/>
+<div style="text-align:left">
 <ul>
-<li>Subclasses of TermTree which represent terms</li>
-<li>Subclasses of TypTree which represent types</li>
-<li>Subclasses of SymTree which introduce or reference definitions.</li>
+<li>Terms</li>
+<li>Types</li>
+<li>Symbols</li>
 </ul>
-<div>Few examples</div>
-ValDef, Expr,Apply, ClassDef, Block, Literal, Constant
+<br/>
+<br/>
+<div>Few examples:</div>
+<ul>
+<li>ValDef, dExpr,Apply, ClassDef, Block, Literal, Constant</li>
+</ul>
+</div>
 </section>
 </section>
 <section>
 <section>
 <h3>Visiting the AST</h3>
 <hr/>
-Manual
-Pattern Matching
+<div style="text-align:left">
+<ul>
+<li>Manual visiting</li>
+<li>Pattern Matching</li>
+</ul>
+<br/>
+<br/>
+<div>Very tedious</div>
+</div>
 </section>
 <section>
 <h3>Visiting with Traverser</h3>
 <hr/>
-<div>Traverser makes sure to visit every node in a given tree, in a breadth-first search.</div>
-
-To use a Traverser, simply subclass Traverser and override method traverse. In doing so, you can simply provide custom logic to handle only the cases
- you're interested in. 
- 
+<div style="text-align:left">
+<ul>
+<li>Traverser makes sure to visit every node in a given tree</li>
+<li>breadth-first search</li>
+<br/>
+<li>To use a Traverser:
+<ul><li>subclass Traverser</li>
+<li>override method traverse</li>
+</ul></li>
+<br/>
+<li>handle only the cases of interest</li>
+</ul>
+<br/>
 <pre><code>object traverser extends Traverser {
 override def traverse(tree: Tree): Unit = tree match {
  case app @ Apply(fun, args) =&gt;
@@ -331,20 +377,37 @@ override def traverse(tree: Tree): Unit = tree match {
 }</code></pre>
 </section>
 <section>
-// Todo 2 use cases
-// API recording
-// System.exit call
-We are in Scala so we must rely on type
+<h3>Use Case #1 - API cartography</h3>
+<hr/>
+<div style="text-align:left">
+<ul><li>Simply visit submitted code and match method calls</li>
+<li>Check if the owning class type is a subtype of the API</li>
+</ul>
+<br/>
+<br/>
+<pre><code>
+if (method.owner.tpe &lt;:&lt; typeOf[demo.Api]) {
+  //register
+}
 
-<pre><code>for (global.Apply(fun, _) &lt;- unit.body) {
-            fun.symbol match {
-              case method: global.MethodSymbol =&gt;
-                val classSymbol = method.owner
-                val systemSymbol = global.findMemberFromRoot(global.TermName(classOf[System].getName))
-                if ((method.nameString == "exit")
-                  &amp;&amp; (classSymbol.tpe &lt;:&lt; systemSymbol.tpe))
-                  unit.error(fun.pos, "System.exit forbidden")
-              case _ =&gt; ()
+</code></pre>
+</section>
+<section>
+<h3>Use Case #2 - Secure API calls</h3>
+<hr/>
+<div style="text-align:left">
+<ul><li>Same visiting mechanism on dedicated API</li>
+<li>Require some plumbing to match type of static calls of Java class</li>
+</ul>
+<br/>
+<br/>
+<pre><code>
+val systemSymbol = global.findMemberFromRoot(global.TermName(classOf[System].getName))
+
+if ( (method.owner.tpe &lt;:&lt; systemSymbol.tpe)  &amp;&amp;
+     (method.nameString == "exit"))
+    unit.error(tree.pos, "System.exit forbidden")
+              
 </code></pre>
 </section>    
 </section>
@@ -353,7 +416,13 @@ We are in Scala so we must rely on type
 <h3>Modifying the AST</h3>
 <hr/>
 Manual
-NodeTree DSL
+NodeTree DSL (not recommended anymore)
+</section>
+<section>
+<h3>Transforming the AST</h3>
+<hr/>
+Transformer
+TypingTransformer
 </section>
 <section>
 <h3>Tree Creation via reify/splice</h3>
@@ -370,9 +439,11 @@ Code example
 reify(println(x.splice))</code></pre>
 </section>
 <section>
-Other options
-Transformer
-TypingTransformer
+<h3>Quasiquotes</h3>
+<hr/>
+More flexibility than reify/spice
+expressiveness
+interpolation
 </section>
 <section>
 <h3>Tree Creation via parse on ToolBoxes</h3>
@@ -380,35 +451,45 @@ TypingTransformer
 Toolboxes can be used to typecheck, compile, and execute abstract syntax trees. 
 A toolbox can also be used to parse a string into an AST.
 
-Let’s see how parse deals with the println example from the previous section:
-<pre><code>import scala.reflect.runtime.universe._
+<pre><code>
+import scala.reflect.runtime.universe._
 import scala.tools.reflect.ToolBox
 
 val tb = runtimeMirror(getClass.getClassLoader).mkToolBox()
 
-showRaw(tb.parse("println(2)"))</code></pre>
+showRaw(tb.parse("println(2)"))
 
+</code></pre>
 
-Typechecking with ToolBoxes
-
-<pre><code>import scala.reflect.runtime.universe._
-val tree = reify { "test".length }.tree
-
-import scala.tools.reflect.ToolBox
-val tb = runtimeMirror(getClass.getClassLoader).mkToolBox()
-
-scala.tools.reflect.ToolBox[reflect.runtime.universe.type] = ...
-
-val ttree = tb.typeCheck(tree)
-
-ttree.tpe
-ttree.symbol</code></pre>
 </section>
 <section>
-<h3>Quasiquotes</h3>
+<h3>Use Case #3 - enhance Scala Syntax</h3>
 <hr/>
-<div>Liftable</div>
-Liftable type class, which defines how values are transformed into trees when spliced in. 
+Use Transformer after parsing to detect a pattern and replace it
+
+<pre><code>
+ case Apply(Select(x, TermName("assign_to")), List(Ident(TermName(name)))) =>
+        ValDef(Modifiers(), TermName(name), TypeTree(), x)
+     
+ case Apply(Select(x, TermName("$minus$minus$greater")), List(Ident(TermName(name)))) =>
+        ValDef(Modifiers(), TermName(name), TypeTree(), x)
+
+</code></pre>
+</section>
+<section>
+<h3>Use Case #4 - Enrich tree</h3>
+<hr/>
+Use Quasiquotes instead of Transformer after parsing to detect a pattern and replace it
+
+<pre><code>
+q"""
+  val t1 = System.currentTimeMillis()
+  val r = $method     
+  val t2 = System.currentTimeMillis()  
+  println("Took "+(t2-t1))
+  r
+"""      
+</code></pre>
 </section>
 </section>
       <section>
@@ -430,10 +511,10 @@ Liftable type class, which defines how values are transformed into trees when sp
 <li>Hot reload</li>
 </ul>
       </section>
-	<!--section>
+	<section>
         <iframe style="display: inline-block; width: 100%; height: 720px; vertical-align: top;" src="index.html"></iframe> 
-        </section-->
-        <section>
+        </section>
+        <!--section>
          <div style="display: inline-block; width: 54%; height: 100%; vertical-align: top;">
      <div style="text-align:left; font-size:0.8em">input:</div>
       <div id="codecontent" style="font-size:0.7em; line-height:100%" ></div></div>
@@ -444,7 +525,7 @@ Liftable type class, which defines how values are transformed into trees when sp
 	 <pre id="status" style="font-size:0.7em; background-color: #eee; height: 282px; width: 100%; -moz-box-sizing: border-box; margin-top:0; overflow:scroll; line-height: 90%"></pre>
       </div>
       <div style="text-align:left"><input style="font-size:0.6em" type="submit" onClick="submitContent()" value="eval" /></div>
-        </section>
+        </section-->
 	</section>
 	<section>
 	<section>
@@ -460,6 +541,7 @@ Liftable type class, which defines how values are transformed into trees when sp
 <hr/>
 <div style="text-align:left">
 <div>Replace visitor and enable some kinds of transformations</div>
+<div>Can be used in the recording, sandboxing and interceptor use cases</div>
 <br/>
 <div style="text-decoration: underline">Drawback:</div>
 <ul><li>Done at runtime
@@ -474,20 +556,37 @@ Liftable type class, which defines how values are transformed into trees when sp
 <div>Interesting to apply some kinds of transformations:</div>
 <div><ul><li>macro annotations to rewrite some part of the code</li></ul></div>
 <br/>
+<div>Can be used in the syntax enrichment use case</div>
+<br/>
 <div style="text-decoration: underline">Drawback:</div>
 <div>Macros have to be called or require some plumbing to be used</div>
 <div>Remains close to AST manipulation</div>
 </div>
 </section>
 <section>
-<h3>Using JAAS as a sandboxing mechanism</h3>
+<h3>Using Parser Combinators</h3>
 <hr/>
 <div style="text-align:left">
-<div>Focus on security replacement</div>
+<ul>
+<li>Using Compiler plugins to define or enhance syntax should really be used for small use cases</li>
+<li>Otherwise use Parser Combinators</li>
+</ul>
+<br/><br/>
+<div>Can be used in the syntax enrichment use case</div>
+</section>
+<section>
+<h3>Using SecurityManager</h3>
+<hr/>
+<div style="text-align:left">
+<div>Part of sandboxing mechanism, provided with JAAS</div>
+<div>Can be used to protect platform from external malicious code</div>
 <br/>
 <div style="text-decoration: underline">Drawbacks:</div>
-<ul><li>Not so easy replacement</li>
-<li>Discovering at runtime</li>
+<ul>
+<li>Not so easy replacement
+<ul><li>Development of customized Permission instances</li></ul>
+</li>
+<li>Performed at runtime</li>
 <li>Granularity of the sandboxing</li>
 </ul>
 </section>
