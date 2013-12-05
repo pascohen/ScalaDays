@@ -12,5 +12,5 @@ def call() = {
 object Test4 extends App {
  
 val c = new C
-c.call()
+c.myMethod(22)
 }
