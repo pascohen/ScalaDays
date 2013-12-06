@@ -6,6 +6,9 @@
 .settings
 .cache
 
+*.swp
+*~
+
 # sbt specific
 dist/*
 target/
