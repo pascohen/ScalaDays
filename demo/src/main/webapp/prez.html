@@ -53,15 +53,32 @@
         <h2>Scala Compiler plugins</h2>
         <hr />
         <h3>Why they matter!</h3>
-      </section>
-      <section>
-         <section>
-            <h3>Let's start with a simple exemple</h3>
-      	    <hr />
-	 </section>
-         <section>
-            <h3>Let's consider that Java Code</h3>
-	    <hr />
+</section>
+<section>
+    <h3>A few words about me</h3>
+    <hr />
+    <table>
+    <tr><td style="text-align:center"><img src="beastie.png" width="40%"/></td>
+    <td style="text-align:left"><ul>
+    <li>Middleware architect at Amadeus</li>
+    <li>Using Scala for 2 years</li>
+    <li>BSD user</li></ul>
+    </td></tr></table>
+    <br/>
+    <hr/>
+    <div style="text-align:left">
+    <ul><li><small>Follow me on twitter @pascohen</small></li>
+    <li><small>Fork me on github <a href="http://github.com/pascohen" style="top: -2px;">http://github.com/pascohen</a></small></li></ul>
+    </div>
+</section>
+<section>
+<section>
+   <h3>Let's start with a simple exemple</h3>
+   <hr />
+</section>
+<section>
+   <h3>Let's consider that Java Code</h3>
+   <hr />
 <pre><code>
 public class ImmutableClass {
    private String field1;
@@ -151,6 +168,18 @@ class ImmutableClass(val String field1, val Int field2)
 </ul>
 </div>
 </section>
+<section>
+<div>
+<h3>Detailed use cases:</h3>
+<hr/>
+<ol>
+<li>API Usage Cartography</li>
+<li>Protection against malicious code</li>
+<li>Syntax enhancement for DSL</li>
+<li>AOP like mechanism</li>
+</ul>
+</div>
+</section>
 </section>
 <section>
 <section>
@@ -180,11 +209,14 @@ class ImmutableClass(val String field1, val Int field2)
 <li>Define inside which class is your plugin entry point</li>
 <li>Your code can be in the same jar (for small plugins) or as separated projects that you add in your project dependencies</li>
 </ol>
-<br/>
-<pre><code>&lt;plugin&gt;
+<br/><br/>
+<pre><code>
+&lt;plugin&gt;
   &lt;name&gt;myPluginName&lt;/name&gt;
   &lt;classname&gt;my.package.path.MyPlugin&lt;/classname&gt;
-&lt;/plugin&gt;</code></pre>
+&lt;/plugin&gt;
+
+</code></pre>
 </section>
 <section>
 <h3>Steps to follow #2: Plugin class</h3>
@@ -238,7 +270,8 @@ class MyPhase(prev: Phase) extends StdPhase(prev) {
 <div><small><a href="http://www.scala-sbt.org/0.13.0/docs/Detailed-Topics/Compiler-Plugins.html">http://www.scala-sbt.org/0.13.0/docs/Detailed-Topics/Compiler-Plugins.html</a></small></div>
 </div>
 <br/>
-<pre><code>autoCompilerPlugins := true
+<pre><code>
+autoCompilerPlugins := true
 
 //addCompilerPlugin("org.scala-lang.plugins" % "continuations" % "2.10.3")
 
@@ -246,6 +279,7 @@ libraryDependencies +=
     compilerPlugin("org.scala-lang.plugins" % "continuations" % scalaVersion.value)
 
 scalacOptions += "-P:continuations:enable"
+
 </code></pre>
 </section>
 <section>
@@ -266,16 +300,18 @@ scalacOptions += "-P:continuations:enable"
 <hr/>
 <div style="text-align:left">
 <div>Adding your own command line options:</div>
-<div>-P: followed by the name of the plugin.</div>
+<div>-P: followed by the name of the plugin</div>
 <br/>
 <div>For example, -P:continuations:enable</div>
 <br/>
 </div>
-<pre><code>override def processOptions(
+<pre><code>
+override def processOptions(
   options: List[String],
   error: String =&gt; Unit)
 
 override val optionsHelp: Option[String]
+
 </code></pre>
 </section>
 </section>
@@ -342,12 +378,13 @@ Apply(Select(Ident(scala.Predef), TermName("println")),
 <hr/>
 <div style="text-align:left">
 <ul>
-<li>Manual visiting</li>
-<li>Pattern Matching</li>
+<li>Default: Manual visiting</li>
+<li>Use Pattern Matching on parts of the tree</li>
 </ul>
 <br/>
 <br/>
-<div>Very tedious</div>
+<div>Very tedious!</div>
+<div>And error prone!</div>
 </div>
 </section>
 <section>
@@ -366,15 +403,18 @@ Apply(Select(Ident(scala.Predef), TermName("println")),
 <li>handle only the cases of interest</li>
 </ul>
 <br/>
-<pre><code>object traverser extends Traverser {
-override def traverse(tree: Tree): Unit = tree match {
- case app @ Apply(fun, args) =&gt;
-    //Some logic  
-    //super.traverse(fun)
-    //super.traverseTrees(args)
-  case _ =&gt; super.traverse(tree)
+<pre><code>
+object traverser extends Traverser {
+  override def traverse(tree: Tree): Unit = tree match {
+    case app @ Apply(fun, args) =&gt;
+      //Some logic  
+      //super.traverse(fun)
+      //super.traverseTrees(args)
+    case _ =&gt; super.traverse(tree)
   }
-}</code></pre>
+}
+
+</code></pre>
 </section>
 <section>
 <h3>Use Case #1 - API cartography</h3>
@@ -415,42 +455,76 @@ if ( (method.owner.tpe &lt;:&lt; systemSymbol.tpe)  &amp;&amp;
 <section>
 <h3>Modifying the AST</h3>
 <hr/>
-Manual
-NodeTree DSL (not recommended anymore)
+<div style="text-align:left">
+<div>Manual Manipulation </div>
+<div>Using Pattern matching</div>
+<br/>
+<div>NodeTree DSL can help - <small style="top:10px"><i>its usage is not recommended anymore</i></small></div>
+<br/>
+<div>Extremely painful</div>
+<div>Neither practicable nor maintainable</div>
 </section>
 <section>
 <h3>Transforming the AST</h3>
 <hr/>
-Transformer
-TypingTransformer
+<div style="text-align:left">
+<div>Use Transformer or TypingTransformer</div>
+<div>Make traversal of AST easier</div>
+<div>Can simplify typing of the created/modified tree</div>
+</div>
 </section>
 <section>
 <h3>Tree Creation via reify/splice</h3>
 <hr/>
-Method reify simply takes a Scala expression as an argument, and produces that argument’s typed Tree representation as a result. cf previously
+<div style="text-align:left">
+<div>Method reify simply takes a Scala expression as an argument, and produces that argument’s typed Tree representation as a result</div>
+<br/>
+<div>Splicing Trees enables to manipulate tree expressions inside reify block</div>
+</div>
+<br/>
+<pre><code>
+val x = reify(2)
+reify(println(x.splice))
 
-Code example
-
-Splicing Trees
-
-Code example
-
-<pre><code>val x = reify(2)
-reify(println(x.splice))</code></pre>
+</code></pre>
 </section>
 <section>
 <h3>Quasiquotes</h3>
 <hr/>
-More flexibility than reify/spice
-expressiveness
-interpolation
+<div style="text-align:left">
+<ul>
+<li><div>A neat DSL to read and manipulate AST (construction/deconstruction)</div></li>
+<li><div>More expressiveness than reify/spice</div></li>
+<li><div>Similar to string interpolation</div></li>
+<li><div>Powerful Pattern matching</div></li>
+</ul>
+</div>
+<br/>
+<pre><code>
+def f(x:Int) = x+1
+
+val r = reify { val i = f(10) }.tree
+
+r match {
+  case q"{ val $varName = $func($arg); ()}" => 
+    println("Match "+varName+" "+func+" -> "+arg)
+  case _ => println("Failed")
+}
+
+</code></pre>
+
 </section>
 <section>
 <h3>Tree Creation via parse on ToolBoxes</h3>
 <hr/>
-Toolboxes can be used to typecheck, compile, and execute abstract syntax trees. 
-A toolbox can also be used to parse a string into an AST.
-
+<div style="text-align:left">
+<div>Toolboxes can be used:</div>
+<ul><li>to typecheck,</li> 
+<li>compile, </li>
+<li>and execute abstract syntax trees</li></ul>
+<br/><br/>
+<div>A toolbox can also be used to parse a string into an AST</div>
+</div>
 <pre><code>
 import scala.reflect.runtime.universe._
 import scala.tools.reflect.ToolBox
@@ -460,13 +534,20 @@ val tb = runtimeMirror(getClass.getClassLoader).mkToolBox()
 showRaw(tb.parse("println(2)"))
 
 </code></pre>
-
+</section>
+<section>
+<h3>Take care of the phase</h3>
+<hr/>
+<div style="text-align:left">
+<div>By visiting, one can use almost any phase</div>
+<div>When transforming AST, early phases are easier but you lose information</div>
+</div>
 </section>
 <section>
 <h3>Use Case #3 - enhance Scala Syntax</h3>
 <hr/>
-Use Transformer after parsing to detect a pattern and replace it
-
+<div>Use Transformer after parsing to detect a pattern and replace it</div>
+<br/>
 <pre><code>
  case Apply(Select(x, TermName("assign_to")), List(Ident(TermName(name)))) =>
         ValDef(Modifiers(), TermName(name), TypeTree(), x)
@@ -479,8 +560,8 @@ Use Transformer after parsing to detect a pattern and replace it
 <section>
 <h3>Use Case #4 - Enrich tree</h3>
 <hr/>
-Use Quasiquotes instead of Transformer after parsing to detect a pattern and replace it
-
+<div style="text-align:left">Use Quasiquotes instead of Transformer after parsing to detect a pattern and replace it</div>
+<br/>
 <pre><code>
 q"""
   val t1 = System.currentTimeMillis()
@@ -488,7 +569,8 @@ q"""
   val t2 = System.currentTimeMillis()  
   println("Took "+(t2-t1))
   r
-"""      
+"""  
+
 </code></pre>
 </section>
 </section>
@@ -610,9 +692,10 @@ q"""
 </ul></li>
 <br/>
 <li>By default, consider alternatives</li>
-<li>They can be very useful</li>
 <br/>
-<li>But be ready to dive into doc ...</li>
+<li>They can be very useful</li>
+<li>But be ready to dive into doc, scaladoc, code, forums ...</li>
+<br/>
 <li>Might impact compile time</li>
 </ul>
 </section>	
@@ -639,8 +722,8 @@ q"""
        <p><small>Based on Reveal.js created by <a href="http://hakim.se">Hakim El Hattab</a> / <a href="http://twitter.com/hakimel">@hakimel</a></small></p>
        <p><small>Powered by vim: <a href="http://www.vim.org/">http://www.vim.org/</a></small></p>
        <p><small>Special thanks @:<ul>
-       <li>Eugene Burmako for his help and advice</li>
-       <li>Mathieu Bruyen for his support</li></ul></small></p>
+       <li>Eugene Burmako (EPFL) for his help and advice</li>
+       <li>Mathieu Bruyen (Amadeus) for his support</li></ul></small></p>
 </div>
     </section>
     </div>
