@@ -25,8 +25,8 @@ class FilterComponent(val name: String, val global: Global) extends PluginCompon
       class FilterTraverser extends global.Traverser {
 
         val systemObject = global.findMemberFromRoot(global.TermName(classOf[java.lang.System].getName)).tpe
-        val rootObject = global.typeOf[test.pcohen.example.A.type]
-        val rootClass = global.typeOf[test.pcohen.example.A]
+        val rootObject = global.typeOf[demo.A.type]
+        val rootClass = global.typeOf[demo.A]
 
         def check(owner: global.Symbol, typ: global.Type, name: global.TermName, pos: global.Position) = {
           if (((typ <:< rootClass) || (typ <:< rootObject))

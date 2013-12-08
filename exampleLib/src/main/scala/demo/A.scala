@@ -1,4 +1,4 @@
-package test.pcohen.example
+package demo
 
 object A {
   def authorizedObjectTask = println("I am an authorized object A task")

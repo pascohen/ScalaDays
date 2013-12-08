@@ -22,12 +22,15 @@ class LogAdderComponent(val name: String, val global: Global) extends PluginComp
   class LogAdderTransformer(unit: global.CompilationUnit) extends global.Transformer {
     import global._
 
-    def handle(m: Tree): Tree = {
-         val a1 = q"""
-      println("Ok")
+    def handle(m: Tree, t:TermName,arguments:List[Tree]): Tree = {
+      val methodName = t.toString
+      val args = arguments.map( t => t.toString).mkString("-")
+      val a1 = q"""
+      println("Before calling "+$methodName+" - "+$args)
       val t1 = System.currentTimeMillis()
       val r = $m     
       val t2 = System.currentTimeMillis()  
+      println("After calling "+$methodName+" - "+$args)
       println("Took "+(t2-t1))
       r
       """
@@ -36,10 +39,10 @@ class LogAdderComponent(val name: String, val global: Global) extends PluginComp
 
     def postTransform(tree: global.Tree): global.Tree = {
       tree match {
-        case Apply(Ident(TermName("myMethod")), _) =>
-          handle(tree)
-        case ValDef(m, i, t, f @ Apply(Ident(TermName("myMethod")), _)) =>
-          ValDef(m, i, t, handle(f))
+        case Apply(Ident(t@TermName("myMethod")), args) =>
+          handle(tree,t,args)
+        case ValDef(m, i, t, f @ Apply(Ident(tm@TermName("myMethod")), args)) =>
+          ValDef(m, i, t, handle(f,tm,args))
         case _ =>
           tree
       }

@@ -1,4 +1,5 @@
-import test.pcohen.example._
+import demo.A
+import demo.B
 
 object Test2 extends App {
 

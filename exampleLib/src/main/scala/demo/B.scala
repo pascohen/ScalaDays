@@ -1,4 +1,4 @@
-package test.pcohen.example
+package demo
 
 class B(s:String) extends A(s) {
   override def authorizedTask = super.authorizedTask
