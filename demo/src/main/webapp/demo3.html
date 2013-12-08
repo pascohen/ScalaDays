@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+   <head>
+      <style type="text/css" media="screen">
+	 body {
+           
+           font-size: 1.4em;
+         }
+
+	 #codecontent { 
+            background: #E3E4FA;
+            font-size: 1em;
+            display: inline-block;
+            width: 100%;
+            height: 600px;
+            margin:0;
+            padding:0;            
+         }
+      </style>
+   </head>
+   <body>
+      <div style="display: inline-block; width: 54%; vertical-align: top;">
+      <div>input:</div>
+        <div id="codecontent">def f(x: Int) = x + 1
+ 
+10 assign_to i1
+f(10) assign_to j1
+
+println(i1 + " - " + j1)
+
+10 --> i2
+f(10) --> j2
+
+println(i2 + " - " + j2)</div>
+      </div>
+      <div style="display: inline-block; width: 44%; height: 630px; vertical-align: top; margin-left: 15px; ">
+	      <div>output:</div>
+	      <pre id="output" style="background-color: #eee; height: 44.5%; width: 100%; -moz-box-sizing: border-box; margin-bottom:1.5%; margin-top:0; overflow: scroll"></pre>
+	      <div style="margin-top:2%">status:</div>
+         <pre id="status" style="background-color: #eee; height: 44.5%; width: 100%; -moz-box-sizing: border-box; margin-top:0; overflow: scroll"></pre>
+      </div>
+      <div style="text-align:left"><input style="font-size: 1em" type="submit" onClick="submitContent()" value="eval" /></div>
+      
+      <script src="js/ace.js" type="text/javascript" charset="utf-8"></script>
+      <script>
+   var editor = ace.edit("codecontent");
+   editor.setTheme("ace/theme/tomorrow");
+   editor.getSession().setMode("ace/mode/scala");
+
+   function submitContent() {
+      var content='{content: '+JSON.stringify(editor.getValue())+'}'
+      var xmlHttpReq = false;
+      // Mozilla/Safari
+      if (window.XMLHttpRequest) {
+        xmlHttpReq = new XMLHttpRequest();
+      }
+      // IE
+      else if (window.ActiveXObject) {
+        xmlHttpReq = new ActiveXObject("Microsoft.XMLHTTP");
+      }
+  
+      xmlHttpReq.onreadystatechange = function() {
+      if (xmlHttpReq.readyState == 4) {
+        var result = JSON.parse(xmlHttpReq.responseText);
+        document.getElementById('output').innerHTML = result.output;
+        document.getElementById('status').innerHTML = result.compilationStatus;
+      }
+    }     
+    xmlHttpReq.open('POST', 'eval', true);
+    xmlHttpReq.setRequestHeader('Content-Type', 'application/json');
+    xmlHttpReq.send(content);
+}
+      </script>
+   </body>
+</html>

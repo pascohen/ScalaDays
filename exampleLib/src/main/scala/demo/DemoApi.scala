@@ -1,7 +1,7 @@
-package test.pcohen.example
+package demo
 
 trait DemoApi {
-  def doSomeJob(s:String):Unit
+  def method(s:String):Unit
   def getState:String
 }
 
@@ -10,6 +10,6 @@ object DemoApi {
 }
 
 class DemoApiImpl(val s:String) extends DemoApi {
-  def doSomeJob(m:String) = println("Handling "+m+" in "+s+" instance")
+  def method(m:String) = println("Method method - instance_value="+s+"/arg="+m)
   def getState = "Ok"
 }

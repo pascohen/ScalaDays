@@ -28,7 +28,7 @@ class RegisterComponent(val name: String, val global: Global) extends PluginComp
     class RegisterTraverser extends global.Traverser {
 
       val register = Map[(global.Symbol, global.TermName), ArrayBuffer[global.Position]]()
-      val demoApi = global.typeOf[test.pcohen.example.DemoApi]
+      val demoApi = global.typeOf[demo.DemoApi]
 
       def checkAndRegister(owner: global.Symbol, typ: global.Type, name: global.TermName, pos: global.Position) = {
         if (typ <:< demoApi) {

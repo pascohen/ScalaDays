@@ -1,7 +1,7 @@
-import test.pcohen.example._
+import demo.DemoApi
 
 object Test extends App {
 val d = DemoApi("a")
-d.doSomeJob("t")
+d.method("t")
 val s = d.getState
 }
