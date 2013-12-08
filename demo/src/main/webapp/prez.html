@@ -3,7 +3,7 @@
 
 <head>
    <meta charset="utf-8">
-   <title>ScalaCompilerDoMatter</title>
+   <title>Scala Compiler Plugins</title>
    <meta name="description" content="Presentation on Scala Compiler features">
    <meta name="apple-mobile-web-app-capable" content="yes" />
    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
@@ -52,7 +52,7 @@
       <section>
         <h2>Scala Compiler plugins</h2>
         <hr />
-        <h3>Why they matter!</h3>
+        <h3>Why they do matter</h3>
 </section>
 <section>
     <h3>A few words about me</h3>
@@ -61,13 +61,13 @@
     <tr><td style="text-align:center"><img src="beastie.png" width="40%"/></td>
     <td style="text-align:left"><ul>
     <li>Middleware architect at Amadeus</li>
-    <li>Using Scala for 2 years</li>
+    <li>Using Scala for 3 years</li>
     <li>BSD user</li></ul>
     </td></tr></table>
     <br/>
     <hr/>
     <div style="text-align:left">
-    <ul><li><small>Follow me on twitter @pascohen</small></li>
+    <ul><li><small>Follow me on twitter <a href="https://twitter.com/PascalCohen">@PascalCohen</a></small></li>
     <li><small>Fork me on github <a href="http://github.com/pascohen" style="top: -2px;">http://github.com/pascohen</a></small></li></ul>
     </div>
 </section>
@@ -133,9 +133,12 @@ class ImmutableClass(val String field1, val Int field2)
 <section>
 <h3>MetaProgramming is not recent</h3>
 <hr />
+<div style="text-align:left">
+<div>Various flavors</div>
+<br/>
 <ul>
 <li>Lisp ... in the 60s!</li>
-<li>C with macros</li>
+<li>Metaprogramming in C with macros</li>
 <br/>
 <li>In JVM world, it has gained some interest:<ul>
 <li>apt (limited features)</li>
@@ -144,16 +147,24 @@ class ImmutableClass(val String field1, val Int field2)
 </ul>
 </li>
 </ul>
+</div>
 </section>
 <section>
 <section>
 <h3>A use case for this session</h3>
 <hr/>
-<div>Custom creation of scripts:</div>
+<div>Custom creation of application scripts:</div>
 <br/>
 <ul>
-<li>submitted by end users</li>
-<li>executed later</li>
+
+<li>Dev env decorrelated from Runtime env:
+<ul>
+<li>Dev on local machine</li>
+<li>Submitted by end users</li>
+<li>Executed later on remote server</li>
+</ul>
+</li>
+<li>Interaction with server side execution flow thanks to API</li>
 </ul>
 </section>
 <section>
@@ -161,7 +172,7 @@ class ImmutableClass(val String field1, val Int field2)
 <h3>Some constraints:</h3>
 <hr/>
 <ul>
-<li>local development</li>
+<li>Local development</li>
 <li>API interaction constraints</li>
 <li>Security/Sandboxing</li>
 <li>DSL capabilities</li>
@@ -367,7 +378,7 @@ Apply(Select(Ident(scala.Predef), TermName("println")),
 <br/>
 <div>Few examples:</div>
 <ul>
-<li>ValDef, dExpr,Apply, ClassDef, Block, Literal, Constant</li>
+<li>ValDef, Expr,Apply, ClassDef, Block, Literal, Constant</li>
 </ul>
 </div>
 </section>
@@ -383,8 +394,8 @@ Apply(Select(Ident(scala.Predef), TermName("println")),
 </ul>
 <br/>
 <br/>
-<div>Very tedious!</div>
-<div>And error prone!</div>
+<div>Tedious!</div>
+<div>Many match cases to consider</div>
 </div>
 </section>
 <section>
@@ -459,10 +470,10 @@ if ( (method.owner.tpe &lt;:&lt; systemSymbol.tpe)  &amp;&amp;
 <div>Manual Manipulation </div>
 <div>Using Pattern matching</div>
 <br/>
-<div>NodeTree DSL can help - <small style="top:10px"><i>its usage is not recommended anymore</i></small></div>
+<div>TreeDSL can help - <small style="top:10px"><i>its usage is not recommended anymore</i></small></div>
 <br/>
-<div>Extremely painful</div>
-<div>Neither practicable nor maintainable</div>
+<div>Painful</div>
+<div>Complex modifications can lead to much boilerplate code</div>
 </section>
 <section>
 <h3>Transforming the AST</h3>
@@ -512,7 +523,10 @@ r match {
 }
 
 </code></pre>
-
+<br/>
+<div style="text-align:left">
+<i>reify</i> works for well-typed trees, whereas <i>quasiquotes</i> offer a broader scope
+</div>
 </section>
 <section>
 <h3>Tree Creation via parse on ToolBoxes</h3>
@@ -677,7 +691,7 @@ q"""
 <section>
 <h3>Conclusion</h3>
 <hr/>
-<div>Do Scala Compiler really matter?</div>
+<div>Do Scala Compiler Plugins really matter?</div>
 <div>Should we use them?</div>
 </section>
 <section>
